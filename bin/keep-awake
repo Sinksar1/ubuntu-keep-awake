@@ -1,0 +1,45 @@
+#!/bin/bash
+# scripted by Othelo!!
+
+PIDFILE="/run/keep-awake.pid"
+
+case "$1" in
+    on)
+        if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+            echo "Keep Awake is already ON"
+            exit 0
+        fi
+
+        systemd-inhibit \
+            --what=handle-lid-switch:sleep \
+            --who="Keep Awake" \
+            --why="Keep laptop running with lid closed for remote access" \
+            --mode=block \
+            sleep infinity &
+
+        echo $! > "$PIDFILE"
+        echo "Keep Awake: ON"
+        ;;
+
+    off)
+        if [ -f "$PIDFILE" ]; then
+            kill "$(cat "$PIDFILE")" 2>/dev/null
+            rm -f "$PIDFILE"
+        fi
+
+        echo "Keep Awake: OFF"
+        ;;
+
+    status)
+        if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+            echo "Keep Awake: ON"
+        else
+            echo "Keep Awake: OFF"
+        fi
+        ;;
+
+    *)
+        echo "Usage: keep-awake {on|off|status}"
+        exit 1
+        ;;
+esac

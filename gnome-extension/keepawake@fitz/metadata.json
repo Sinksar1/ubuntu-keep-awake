@@ -1,0 +1,7 @@
+{
+  "uuid": "keepawake@fitz",
+  "name": "Keep Awake",
+  "description": "Keep Ubuntu running when the lid is closed",
+  "shell-version": ["46"],
+  "version": 1
+}
